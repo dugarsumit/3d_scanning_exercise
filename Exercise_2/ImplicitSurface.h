@@ -76,7 +76,9 @@ public:
 		Eigen::Vector3f n = m_pointcloud.GetNormals()[idx];
 
 		// TODO: implement the evaluation using Hoppe's method (see lecture slides)
-		return 0.0;
+		Eigen::Vector3d temp = (_x - p.cast<double>());
+		double val = temp.dot(n.cast<double>());
+		return val;
 	}
 
 private:
