@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "adolcforward": "cpp"
+        "adolcforward": "cpp",
+        "alignedvector3": "cpp",
+        "functional": "cpp"
     }
 }

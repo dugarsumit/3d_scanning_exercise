@@ -16,7 +16,7 @@ int main()
 	//surface = new Sphere(Eigen::Vector3d(0.5, 0.5, 0.5), 0.4);
 	//surface = new Torus(Eigen::Vector3d(0.5, 0.5, 0.5), 0.4, 0.1);
 	surface = new Hoppe(filenameIn);
-	//surface = new RBF(filenameIn);
+	surface = new RBF(filenameIn);
 
 	// fill volume with signed distance values
 	unsigned int mc_res = 50; // resolution of the grid, for debugging you can reduce the resolution (-> faster)
