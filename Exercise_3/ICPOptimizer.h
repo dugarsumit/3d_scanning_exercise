@@ -109,10 +109,23 @@ public:
 		// increment (pose parameters) to the source point, you can use the PoseIncrement
 		// class.
 		// Important: Ceres automatically squares the cost function.
-
-		residuals[0] = T(0);
-		residuals[1] = T(0);
-		residuals[2] = T(0);
+		T poseArray[6];
+		poseArray[0] = pose[0];
+		poseArray[1] = pose[1];
+		poseArray[2] = pose[2];
+		poseArray[3] = pose[3];
+		poseArray[4] = pose[4];
+		poseArray[5] = pose[5];
+		PoseIncrement<T> poseIncrement = PoseIncrement<T>(poseArray);
+		T transformedSourcePoint[3];
+		T sourcePoint[3];
+		sourcePoint[0] = (T)m_sourcePoint(0);
+		sourcePoint[1] = (T)m_sourcePoint(1);
+		sourcePoint[2] = (T)m_sourcePoint(2);
+		poseIncrement.apply(sourcePoint, transformedSourcePoint);
+		residuals[0] = transformedSourcePoint[0] - (T)m_targetPoint(0);
+		residuals[1] = transformedSourcePoint[1] - (T)m_targetPoint(1);
+		residuals[2] = transformedSourcePoint[2] - (T)m_targetPoint(2);
 
 		return true;
 	}
@@ -146,6 +159,26 @@ public:
 		// increment (pose parameters) to the source point, you can use the PoseIncrement
 		// class.
 		// Important: Ceres automatically squares the cost function.
+		T poseArray[6];
+		poseArray[0] = pose[0];
+		poseArray[1] = pose[1];
+		poseArray[2] = pose[2];
+		poseArray[3] = pose[3];
+		poseArray[4] = pose[4];
+		poseArray[5] = pose[5];
+		PoseIncrement<T> poseIncrement = PoseIncrement<T>(poseArray);
+		T transformedSourcePoint[3];
+		T sourcePoint[3];
+		sourcePoint[0] = (T)m_sourcePoint(0);
+		sourcePoint[1] = (T)m_sourcePoint(1);
+		sourcePoint[2] = (T)m_sourcePoint(2);
+		poseIncrement.apply(sourcePoint, transformedSourcePoint);
+		T res_part[3];
+		res_part[0] = (transformedSourcePoint[0] - (T)m_targetPoint(0)) * (T)m_targetNormal(0);
+		res_part[1] = (transformedSourcePoint[1] - (T)m_targetPoint(1)) * (T)m_targetNormal(1);
+		res_part[2] = (transformedSourcePoint[2] - (T)m_targetPoint(2)) * (T)m_targetNormal(2);
+
+		residuals[0] = res_part[0] + res_part[1] + res_part[2];
 
 		residuals[0] = T(0);
 		
@@ -283,7 +316,9 @@ private:
 
 				// TODO: Create a new point-to-point cost function and add it as constraint (i.e. residual block) 
 				// to the Ceres problem.
-
+				double* pose = poseIncrement.getData();
+				ceres::CostFunction* pointToPointCost = PointToPointConstraint::create(sourcePoint,targetPoint,1);
+				problem.AddResidualBlock(pointToPointCost, NULL, pose);
 
 				if (m_bUsePointToPlaneConstraints) {
 					const auto& targetNormal = targetNormals[match.idx];
@@ -293,7 +328,8 @@ private:
 					 
 					// TODO: Create a new point-to-plane cost function and add it as constraint (i.e. residual block) 
 					// to the Ceres problem.
-
+					ceres::CostFunction* pointToPlaneCost = PointToPlaneConstraint::create(sourcePoint,targetPoint,targetNormal,1);
+					problem.AddResidualBlock(pointToPlaneCost, NULL, pose);
 				}
 			}
 		}

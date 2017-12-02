@@ -82,8 +82,13 @@ public:
 				}
 
 				// TODO: Compute the normals using central differences. 
+				const float xu = 1;
+				const float xv = 0;
+				const float yu = 0;
+				const float yv = 1; 
 
-				normalsTmp[idx] = Vector3f(1, 1, 1); // Needs to be replaced.
+				//normalsTmp[idx] = Vector3f(1, 1, 1); // Needs to be replaced.
+				normalsTmp[idx] = Vector3f(yu*dv - yv*du, xv*du - xu*dv, xu*yv - yu*xv);
 				normalsTmp[idx].normalize();
 			}
 		}
